@@ -51,3 +51,9 @@ a35[1,]/a35[1,1]
 calc_lam(a) # Lambda
 calc_w(a) # Stable age proportions
 calc_v(a) # Reproductive value
+
+
+# Do we even need to include an age class with no reproductive value?
+a3 = a[1:3,1:3]
+calc_lam(a3)
+calc_lam(a) # No, we don't, these are the same.
