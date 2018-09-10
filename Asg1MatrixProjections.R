@@ -1,7 +1,5 @@
 source("~/Documents/leslie.R")
 
-library(demogR)
-
 #----Question 1----
 
 # Life table values
