@@ -56,8 +56,6 @@ A = matrix(c(0,1.46,0,0.912,0,0.562,0,0,
              0,0,0,0,0,0.281,0,0,
              0,0,0,0,0,0,0.222,0), 8, 8, byrow=T) # from Populus
 
-n = matrix(c(10,0,0,0,0,0,0,0),8,1)
-
 # Running 20 samples to explore stable age proportions
 set.seed(4100)
 {
@@ -82,3 +80,35 @@ set.seed(4100)
   age_plot(A, 30, matrix(sample(0:100,8,replace=T),8,1)) 
   age_plot(A, 30, matrix(sample(0:100,8,replace=T),8,1)) 
 } # No, not all populations reach stable age distribution, but some of these appeared to!
+
+round(calc_w(A),2)
+
+#----Question 3----
+
+# Part (b)
+a = matrix(c(0,0,1.05,
+             0.35,0,0,
+             0,0.7,0.7), 3,3,byrow = T)
+calc_lam(a)
+
+#----Question 4----
+a_post = matrix(c(0,10,18,0,
+             0.08,0,0,0,
+             0,0.15,0,0,
+             0,0,1.0,0),4,4,byrow=T)
+lam_post = round(calc_lam(a_post),10)
+
+
+a_pre = matrix(c(0,(0.08*(10/0.15)),1.44,0,
+             0.15,0,0,0,
+             0,1,0,0,
+             0,0,0,0), 4,4, byrow=T)
+lam_pre = round(calc_lam(a_pre), 10)
+
+lam_post == lam_pre # check
+
+calc_v(a_post)
+calc_v(a_pre)
+
+calc_w(a_post)
+calc_w(a_pre)
