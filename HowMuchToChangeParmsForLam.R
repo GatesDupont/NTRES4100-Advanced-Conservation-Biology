@@ -1,60 +1,159 @@
-source("~/Documents/leslie.R")
+# Gates Dupont    #
+# F18, NTRES 4100 #
+# # # # # # # # # #
 
-# Our standard matrix
-a = matrix(c(0,20,50,0.05,0,0,0,0.1,0), 3, 3, byrow=T)
-
-# Lambda
-calc_lam(a)
-
-# Sensitivity matrix
-calc_sm(a)
-# There is no baby-to-baby transiiton, but if there was, what could the impact be?
-
-# Elasticity matrix
-calc_em(a) # You can only do elasticity for non-zeros, 
-# can't calculate proportional change from zero!
-# These add up to one, so prooprtional contribution of each to lambda
-
+# Loading the Leslie library
+source('~/4100/leslie.R')
 library(raster)
-plot(raster(calc_em(a)), axes=F, main="Elasticity Matrix")
+library(ggplot2)
+library(gridExtra)
 
-#
-a = matrix(c(0,0.96,1.12,
-         0.5,0,0,
-         0,0.8,0),3,3, byrow=T)
-
-calc_lam(a) # The population is decreasing... but lets say its a rare species
-# that you dont want to go extinct
-
-# So what would I need to do at minimum to stop the population from declining?
-# Get lambda equal to 1... "stop the bleeding"
-1 - calc_lam(a)
-
-(sm = calc_sm(a))
-
-# Doing the partial derivatives in r 
-example.elements = expression(0, s_a*m_2, s_a*m_3,
-                              s_j, 0, 0,
-                              0, s_a, 0)
-example.parms = list(s_a=0.8, s_j=0.5, m_2=1.2, m_3=1.4)
-# You just need these two pieces
-
-# Calculatting lower-level elasticities and sensitivities
-lower_level(example.elements, example.parms)
-
-# So here, we would want to change adult survival, because that has the highest
-# elasticity value. And this is 80% of preliminary conservation plans.
+#----QUESTION 1----
 
 
-demo = matrix(c(0,20,50,0.5,0,0,0,0.1,0), 3,3,byrow=T)
-eigen(demo)
 
-# GET THE NEW S_a VALUES FROM wxMaxima!!!
-  # a: Input the matrix
-  # cp: charpoly(a, lambda)
-  # cp_test: substitue ([parameters with estimates, except what you want to chage, force lambda = 1], [cp])
-  # float(solve(cp_test))
+#----wet Years----
 
-# Now put that newestiate, of how much to change Sa, into the original matrix.
-a_revised = matrix(c(0,0.84117*1.2,0.84117*1.4,0.5,0,0,0,0.84117,0), 3, 3, byrow=T)
-calc_lam(a_revised)
+# Inputting vital rates
+wf1=8.0 ; wf2=12.0 ; wf3=18.0 ; ws=0.400 ; we1=0.100 ; we2=0.020 ; wg=0.0725
+
+# Generating population matrix
+wet = matrix(c( wf1*wg     , wf2*wg     , wf3*wg     , 0          , 0          ,
+                
+                0          , 0          , 0          , ws*we1     , 0          ,
+                
+                0          , 0          , 0          , 0          , ws*we2     ,
+                
+                wf1*(1-wg) , wf2*(1-wg) , wf3*(1-wg) , 0          , 0          ,
+                
+                0          , 0          , 0          , ws*(1-we1) , ws*(1-we2)  ),
+             5,5, byrow=T)
+
+calc_lam(wet) # asymptotic growth rate
+
+
+
+
+#----Dry Years----
+
+df1=8.2 ; df2=12.5 ; df3=19.0 ; ds=0.425 ; de1=0.058 ; de2=0.0045 ; dg=0.080
+
+dry = matrix(c( df1*dg     , df2*dg     , df3*dg     , 0          , 0          ,
+                
+                0          , 0          , 0          , ds*de1     , 0          ,
+                
+                0          , 0          , 0          , 0          , ds*de2     ,
+                
+                df1*(1-dg) , df2*(1-dg) , df3*(1-dg) , 0          , 0          ,
+                
+                0          , 0          , 0          , ds*(1-de1) , ds*(1-de2)  ),
+             5,5, byrow=T)
+
+calc_lam(dry) # asymptotic growth rate
+
+
+
+
+#----ltre_ll----
+
+alpha = calc_lam(wet)-calc_lam(dry)
+
+p.wet=list(f1=8.0, f2=12.0, f3=18.0, s=0.400, e1=0.100, e2=0.020 , g=0.0725)
+p.dry=list(f1=8.2, f2=12.5, f3=19.0, s=0.425, e1=0.058, e2=0.0045, g=0.080)
+parms = list(p.wet, p.dry)
+
+structure = expression(f1*g     , f2*g     , f3*g     , 0        , 0        ,
+                       0        , 0        , 0        , s*e1     , 0        ,
+                       0        , 0        , 0        , 0        , s*e2     ,
+                       f1*(1-g) , f2*(1-g) , f3*(1-g) , 0        , 0        ,
+                       0        , 0        , 0        , s*(1-e1) , s*(1-e2)  )
+ltre_ll(parms, structure, 1) # r is the matrix to compare to. If rmd, assumes mean mtrx
+
+
+
+
+#----overall em----
+
+par(mfrow=c(1,2))
+# WET Viz of elasticity
+wet.em = calc_em(wet)
+r.wet.em = raster(wet.em)
+plot(r.wet.em, axes=F, main = "Wet Years - Elasticity Matrix", 
+     col = colorRampPalette(c("gray", "purple", "blue"))(100)); text(r.wet.em, digits=4, col="white", font=2, cex=1.1)
+
+# DRY Viz of elasticity
+dry.em = calc_em(dry)
+r.dry.em = raster(dry.em)
+plot(r.dry.em, axes=F, main = "Dry Years - Elasticity Matrix", 
+     col = colorRampPalette(c("gray", "purple", "blue"))(100)); text(r.dry.em, digits=4, col="white", font=2, cex=1.1)
+dev.off()
+
+
+
+#----ll em----
+
+# WET Running LL
+wet.parms = list(wf1=8.0, wf2=12.0, wf3=18.0, ws=0.400, we1=0.100, we2=0.020, wg=0.0725)
+wet.elems = expression(wf1*wg     , wf2*wg     , wf3*wg     , 0          , 0          ,
+                       0          , 0          , 0          , ws*we1     , 0          ,
+                       0          , 0          , 0          , 0          , ws*we2     ,
+                       wf1*(1-wg) , wf2*(1-wg) , wf3*(1-wg) , 0          , 0          ,
+                       0          , 0          , 0          , ws*(1-we1) , ws*(1-we2)  )
+wetLL = data.frame(lower_level(wet.elems, wet.parms))
+
+# DRY Running LL
+dry.parms = list(df1=8.2, df2=12.5, df3=19.0, ds=0.425, de1=0.058, de2=0.0045, dg=0.080)
+dry.elems = expression(df1*dg     , df2*dg     , df3*dg     , 0          , 0          ,
+                       0          , 0          , 0          , ds*de1     , 0          ,
+                       0          , 0          , 0          , 0          , ds*de2     ,
+                       df1*(1-dg) , df2*(1-dg) , df3*(1-dg) , 0          , 0          ,
+                       0          , 0          , 0          , ds*(1-de1) , ds*(1-de2)  )
+dryLL = data.frame(lower_level(dry.elems, dry.parms))
+
+parameter_names = c("F1", "F2", "F3", "S", "e1", "e2", "gamma")
+
+# Making plots
+rownames(wetLL) = parameter_names
+wet_em_bar = ggplot(wetLL, aes(x = row.names(wetLL))) + 
+  geom_col(aes(y=elasticity, fill=elasticity)) +
+  scale_fill_gradientn(colours = rev(topo.colors(7))) +
+  ggtitle("Wet: Lower-Level Elasticity") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold")) +
+  labs(x = "Parameters")
+
+rownames(dryLL) = parameter_names
+dry_em_bar = ggplot(dryLL, aes(x = row.names(dryLL))) + 
+  geom_col(aes(y=elasticity, fill=elasticity)) +
+  scale_fill_gradientn(colours = rev(topo.colors(7))) +
+  ggtitle("Dry: Lower-Level Elasticity") +
+  theme(plot.title = element_text(hjust = 0.5, face="bold")) +
+  labs(x = "Parameters")
+
+grid.arrange(wet_em_bar, dry_em_bar, ncol=1)
+
+
+
+
+#----Decrease F----
+
+# WET Decreasing rate of seed production by 10%
+wf1_red=8.0*0.9 ; wf2_red=12.0*0.9 ; wf3_red=18.0*0.9
+
+wet_redF = matrix(c( wf1_red*wg     , wf2_red*wg     , wf3_red*wg      , 0          , 0          ,
+                     0              , 0              , 0               , ws*we1     , 0          ,
+                     0              , 0              , 0               , 0          , ws*we2     ,
+                     wf1_red*(1-wg) , wf2_red*(1-wg) , wf3_red*(1-wg)  , 0          , 0          ,
+                     0              , 0              , 0               , ws*(1-we1) , ws*(1-we2)  ),
+                  5,5, byrow=T)
+
+calc_lam(wet_redF) # asymptotic growth rate
+
+# DRY Decreasing rate of seed production by 10%
+df1_red=8.2*0.9 ; df2_red=12.5*0.9 ; df3_red=19.0*0.9
+
+dry_redF = matrix(c( df1_red*dg     , df2_red*dg     , df3_red*dg     , 0          , 0          ,
+                     0              , 0              , 0              , ds*de1     , 0          ,
+                     0              , 0              , 0              , 0          , ds*de2     ,
+                     df1_red*(1-dg) , df2_red*(1-dg) , df3_red*(1-dg) , 0          , 0          ,
+                     0              , 0              , 0              , ds*(1-de1) , ds*(1-de2)  ),
+                  5,5, byrow=T)
