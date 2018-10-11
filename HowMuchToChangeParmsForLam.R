@@ -145,8 +145,9 @@ wet_redF = matrix(c( wf1_red*wg     , wf2_red*wg     , wf3_red*wg      , 0      
                      wf1_red*(1-wg) , wf2_red*(1-wg) , wf3_red*(1-wg)  , 0          , 0          ,
                      0              , 0              , 0               , ws*(1-we1) , ws*(1-we2)  ),
                   5,5, byrow=T)
-
+calc_lam(wet)
 calc_lam(wet_redF) # asymptotic growth rate
+calc_lam(wet) - calc_lam(wet_redF) # -0.0689
 
 # DRY Decreasing rate of seed production by 10%
 df1_red=8.2*0.9 ; df2_red=12.5*0.9 ; df3_red=19.0*0.9
@@ -157,5 +158,6 @@ dry_redF = matrix(c( df1_red*dg     , df2_red*dg     , df3_red*dg     , 0       
                      df1_red*(1-dg) , df2_red*(1-dg) , df3_red*(1-dg) , 0          , 0          ,
                      0              , 0              , 0              , ds*(1-de1) , ds*(1-de2)  ),
                   5,5, byrow=T)
-
+calc_lam(dry)
 calc_lam(dry_redF) # asymptotic growth rate
+calc_lam(dry) - calc_lam(dry_redF) # -0.0711
