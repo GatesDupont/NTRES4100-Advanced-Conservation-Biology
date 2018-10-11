@@ -49,7 +49,9 @@ wet.elems = expression(wf1*wg     , wf2*wg     , wf3*wg     , 0          , 0    
                        wf1*(1-wg) , wf2*(1-wg) , wf3*(1-wg) , 0          , 0          ,
                        0          , 0          , 0          , ws*(1-we1) , ws*(1-we2)  )
 lower_level(wet.elems, wet.parms)
-
+wetLL = data.frame(lower_level(wet.elems, wet.parms)); wetLL$vars = rownames(wetLL)
+r.sm.wetLL = raster(as.matrix(wetLL[,2]))
+r.em.wetLL = raster(as.matrix(wetLL[,3]))
 
 
 # Dry years
@@ -90,3 +92,15 @@ dry.elems = expression(df1*dg     , df2*dg     , df3*dg     , 0          , 0    
                        df1*(1-dg) , df2*(1-dg) , df3*(1-dg) , 0          , 0          ,
                        0          , 0          , 0          , ds*(1-de1) , ds*(1-de2)  )
 lower_level(dry.elems, dry.parms)
+dryLL = data.frame(lower_level(dry.elems, dry.parms)); dryLL$vars = rownames(dryLL)
+r.sm.dryLL = raster(as.matrix(dryLL[,2]))
+r.em.dryLL = raster(as.matrix(dryLL[,3]))
+
+
+# Comparing the lower-level analyses for the two populations
+par(mfrow=c(2,2))
+plot(r.sm.wetLL, col = colorRampPalette(c("gray90", "yellow", "green"))(100))
+plot(r.em.wetLL, col = colorRampPalette(c("gray", "purple", "blue"))(100))
+plot(r.sm.dryLL, col = colorRampPalette(c("gray90", "yellow", "green"))(100))
+plot(r.em.dryLL, col = colorRampPalette(c("gray", "purple", "blue"))(100))
+dev.off()
