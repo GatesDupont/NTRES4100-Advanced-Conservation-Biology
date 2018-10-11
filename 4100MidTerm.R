@@ -204,3 +204,4 @@ t(pv_comp) # Comparing the friend's vals to correct vals
 stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test)
 # This suggests that the friend's equation works a little better
 # for scalar populations, but not perfect.
+# structured: 1.058 vs scalar: 0.9935
