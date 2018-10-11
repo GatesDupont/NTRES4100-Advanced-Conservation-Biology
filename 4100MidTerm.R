@@ -200,3 +200,7 @@ t(pv_comp) # Comparing the friend's vals to correct vals
 
 # So, our friend's equation doesn't work for a structured population
 # but perhaps it would work for a scalar? Idk how to test this, though.
+
+stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test)
+# This suggests that the friend's equation works a little better
+# for scalar populations, but not perfect.
