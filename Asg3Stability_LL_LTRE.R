@@ -1,107 +1,103 @@
-# Gates Dupont #
-# N4100 F18    #
-# # # # # # # #
+# Gates Dupont    #
+# F18, NTRES 4100 #
+# # # # # # # # # #
 
-#source('~/4100/leslie.R', encoding = 'UTF-8')
+# Loading the Leslie library
+source('~/4100/leslie.R')
 library(raster)
 
-### Question 1 ####
+#----Question 1----
 
-#----Arjosh Fish----
+### WET YEARS ###
 
- s0=0.15; s1=0.15; s2=0.15; s3=0;
+# Inputting vital rates
+wf1=8.0 ; wf2=12.0 ; wf3=18.0 ; ws=0.400 ; we1=0.100 ; we2=0.020 ; wg=0.0725
 
- m2=37; m3=50;
+# Generating population matrix
+wet = matrix(c( wf1*wg     , wf2*wg     , wf3*wg     , 0          , 0          ,
+                
+                0          , 0          , 0          , ws*we1     , 0          ,
+                
+                0          , 0          , 0          , 0          , ws*we2     ,
+                
+                wf1*(1-wg) , wf2*(1-wg) , wf3*(1-wg) , 0          , 0          ,
+                
+                0          , 0          , 0          , ws*(1-we1) , ws*(1-we2)  ),
+             5,5, byrow=T)
 
- a = matrix(c(0,s1*m2, s2*m3, s3, s0, 0,0,0,0,s1,0,0,0,0,s2,0), 4,4, byrow=T)
+calc_lam(wet) # asymptotic growth rate
+calc_v(wet) # repro value
+calc_w(wet) # stable age dist.
 
- # Calculations
- calc_lam(a)
- calc_v(a)
- calc_w(a)
- 
- a.parms <- list(s0=0.15, s1=0.15, s2=0.15, s3=0, m2=25, m3=50);
- a.elems <- expression(0,s1*m2, s2*m3, s3, s0, 0,0,0,0,s1,0,0,0,0,s2,0);
- #lower_level(a.elems, a.parms)
+# Viz of sensitivity
+wet.sm = calc_sm(wet)
+r.wet.sm = raster(wet.sm)
+plot(r.wet.sm, axes=F, main = "Wet Years - Sensitivty Matrix",
+     col = colorRampPalette(c("gray90", "yellow", "green"))(100)); text(r.wet.sm, digits=4,  font=2, cex=1.1)
 
- N = matrix(c(100,100,10,5),4,1, byrow = T)
- 
- age_plot(a, 30, N)
- 
- calc_lam(a)
- 
- #----ANSWER----
- # Put feeders with 2 year olds, because you don't need to change m2
- # as much as you would need to change m3 in order to reach stability.
- # Also, if you were to change m3, you would have to double it,
- # and for an age class of just 5 individuals, that's likely almost
- # impossible, and even less possible in a stochastic system.
- 
- 
- 
-### Question 2 ###
- 
-#----Sea Urchins----
+# Viz of elasticity
+wet.em = calc_em(wet)
+r.wet.em = raster(wet.em)
+plot(r.wet.em, axes=F, main = "Wet Years - Elasticity Matrix", 
+     col = colorRampPalette(c("gray", "purple", "blue"))(100)); text(r.wet.em, digits=4, col="white", font=2, cex=1.1)
 
-s_0=0.2;s_1=0.3;s_2=0.5;s_3=0.6;m_4=65;beta_0=0.1;psi_0=0.4;psi_1=0.6;psi_2=0.2;gamma_1=0.1;gamma_3=0.05;
+# Running LL
+wet.parms = list(wf1=8.0, wf2=12.0, wf3=18.0, ws=0.400, we1=0.100, we2=0.020, wg=0.0725)
+wet.elems = expression(wf1*wg     , wf2*wg     , wf3*wg     , 0          , 0          ,
+                       0          , 0          , 0          , ws*we1     , 0          ,
+                       0          , 0          , 0          , 0          , ws*we2     ,
+                       wf1*(1-wg) , wf2*(1-wg) , wf3*(1-wg) , 0          , 0          ,
+                       0          , 0          , 0          , ws*(1-we1) , ws*(1-we2)  )
+lower_level(wet.elems, wet.parms)
 
-a=matrix(c(s_0*(1-psi_0)*(1-beta_0),s_1*(1-psi_1)*gamma_1,0,s_3*(1-gamma_3)*m_4,s_0*psi_0*(1-beta_0),s_1*(1-psi_1)*(1-gamma_1),0,s_3*gamma_3,s_0*(1-psi_0)*beta_0,s_1*psi_1,s_2*(1-psi_2),0,0,0,s_2*psi_2,s_3*(1-gamma_3)),4,4,byrow=T)
+### DRY YEARS ###
+df1=8.2 ; df2=12.5 ; df3=19.0 ; ds=0.425 ; de1=0.058 ; de2=0.0045 ; dg=0.080
 
-calc_lam(a) # decline of nearly 13% per year
+dry = matrix(c( df1*dg     , df2*dg     , df3*dg     , 0          , 0          ,
+                
+                0          , 0          , 0          , ds*de1     , 0          ,
+                
+                0          , 0          , 0          , 0          , ds*de2     ,
+                
+                df1*(1-dg) , df2*(1-dg) , df3*(1-dg) , 0          , 0          ,
+                
+                0          , 0          , 0          , ds*(1-de1) , ds*(1-de2)  ),
+             5,5, byrow=T)
 
-# Calculatting lower-level elasticities and sensitivities
-elements = expression(s_0*(1-psi_0)*(1-beta_0),s_1*(1-psi_1)*gamma_1,0,s_3*(1-gamma_3)*m_4,s_0*psi_0*(1-beta_0),s_1*(1-psi_1)*(1-gamma_1),0,s_3*gamma_3,s_0*(1-psi_0)*beta_0,s_1*psi_1,s_2*(1-psi_2),0,0,0,s_2*psi_2,s_3*(1-gamma_3))
-parms = list(s_0=0.2,s_1=0.3,s_2=0.5,s_3=0.6,m_4=65,beta_0=0.1,psi_0=0.4,psi_1=0.6,psi_2=0.2,gamma_1=0.1,gamma_3=0.05)
-lower_level(elements, parms)
-# Highest sensitivity: s_0, highest elasticity: s_3 
+calc_lam(dry) # asymptotic growth rate
+calc_v(dry) # repro value
+calc_w(dry) # stable age dist.
 
-a.sm = calc_sm(a)
-r.a.sm = raster(a.sm)
-plot(r.a.sm, axes=F, main = "Sea Urchins - Sensitivty Matrix", 
-     col = colorRampPalette(c("gray90", "yellow", "green"))(100)); text(r.a.sm, digits=4,  font=2, cex=1.1)
- 
-a.em = calc_em(a)
-r.a.em = raster(a.em)
-plot(r.a.em, axes=F, main = "Sea Urchins - Elasticity Matrix", 
-     col = colorRampPalette(c("gray", "purple", "blue"))(100)); text(r.a.em, digits=4, col="white", font=2, cex=1.1)
+# Viz of sensitivity
+dry.sm = calc_sm(dry)
+r.dry.sm = raster(dry.sm)
+plot(r.dry.sm, axes=F, main = "Dry Years - Sensitivty Matrix",
+     col = colorRampPalette(c("gray90", "yellow", "green"))(100)); text(r.dry.sm, digits=4,  font=2, cex=1.1)
 
-#----ANSWER----
-# Both gammas have negative sm and em _> increase in gammas = decrease in lambda (shrink)
-# beta, though, has positive sm and em -> increase in beta = increase in lambda (skip)
-# So warming waters causes increase in gamma for a decrease in lambda
-# and a decrease in beta so an extra decrease in lambda. Population will decline even faster.
+# Viz of elasticity
+dry.em = calc_em(dry)
+r.dry.em = raster(dry.em)
+plot(r.dry.em, axes=F, main = "Dry Years - Elasticity Matrix", 
+     col = colorRampPalette(c("gray", "purple", "blue"))(100)); text(r.dry.em, digits=4, col="white", font=2, cex=1.1)
 
-
-### Question 3 ####
-
-#----Newts----
-
- 
-# far
-s0_f=0.5; s1_f=0.6; s2_f=0.7; s3_f=0.8;
-m2_f=1.9; m3_f=3.2;
-
-# near
-s0_n=0.3; s1_n=0.4; s2_n=0.7; s3_n=0.78;
-m2_n=1.5; m3_n=2.8;
-
-far <- matrix(c(0,s1_f*m2_f,s2_f*m3_f,s3_f*m3_f,s0_f,0,0,0,0,s1_f,0,0,0,0,s2_f,s3_f),4,4,byrow=T)
-near <- matrix(c(0,s1_n*m2_n,s2_n*m3_n,s3_n*m3_n,s0_n,0,0,0,0,s1_n,0,0,0,0,s2_n,s3_n),4,4,byrow=T)
-
-calc_lam(far)
-calc_lam(near)
-
-p_far=list(s0=0.5, s1=0.6, s2=0.7, s3=0.8, m2=1.9, m3=3.2)
-p_near=list(s0=0.3, s1=0.4, s2=0.7, s3=0.78, m2=1.5, m3=2.8)
-parms = list(p_far, p_near)
-
-structure = expression(0,s1*m2,s2*m3,s3*m3,s0,0,0,0,0,s1,0,0,0,0,s2,s3)
-ltre_ll(parms, structure,1)
-
-#----ANSWER----
-# Near population isn't growing as quickly as the far population (alpha = -0.3)
-# Difference is driven by declines in all lower level parameters except sub-adult survival
-# and is primarily due to s0 (egg survival), which is LTRE ll sens = -0.13860402 out of the -0.3.
+# Running LL
+dry.parms = list(df1=8.2, df2=12.5, df3=19.0, ds=0.425, de1=0.058, de2=0.0045, dg=0.080)
+dry.elems = expression(df1*dg     , df2*dg     , df3*dg     , 0          , 0          ,
+                       0          , 0          , 0          , ds*de1     , 0          ,
+                       0          , 0          , 0          , 0          , ds*de2     ,
+                       df1*(1-dg) , df2*(1-dg) , df3*(1-dg) , 0          , 0          ,
+                       0          , 0          , 0          , ds*(1-de1) , ds*(1-de2)  )
+lower_level(dry.elems, dry.parms)
 
 
+### LIFE-TABLE RESPONSE EXPERIMENT ###
+p.wet=list(f1=8.0, f2=12.0, f3=18.0, s=0.400, e1=0.100, e2=0.020 , g=0.0725)
+p.dry=list(f1=8.2, f2=12.5, f3=19.0, s=0.425, e1=0.058, e2=0.0045, g=0.080)
+parms = list(p.wet, p.dry)
 
+structure = expression(f1*g     , f2*g     , f3*g     , 0        , 0        ,
+                       0        , 0        , 0        , s*e1     , 0        ,
+                       0        , 0        , 0        , 0        , s*e2     ,
+                       f1*(1-g) , f2*(1-g) , f3*(1-g) , 0        , 0        ,
+                       0        , 0        , 0        , s*(1-e1) , s*(1-e2)  )
+ltre_ll(parms, structure, 1) # r is the matrix to compare to. If rmd, assumes mean mtrx
