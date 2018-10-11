@@ -157,3 +157,5 @@ dry_redF = matrix(c( df1_red*dg     , df2_red*dg     , df3_red*dg     , 0       
                      df1_red*(1-dg) , df2_red*(1-dg) , df3_red*(1-dg) , 0          , 0          ,
                      0              , 0              , 0              , ds*(1-de1) , ds*(1-de2)  ),
                   5,5, byrow=T)
+
+calc_lam(dry_redF) # asymptotic growth rate
