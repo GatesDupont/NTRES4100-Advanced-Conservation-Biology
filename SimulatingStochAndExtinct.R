@@ -186,5 +186,9 @@ x = -log(calc_lam(poor))/log(calc_lam(good))
 calc_lam(poor)*(calc_lam(good)^x)
 
 env = list(good, poor)
-pv = c(1-(1/x),(1/x)) # Testing the frequencies of each
-stochgr(env, 100, pv)
+
+pv_test = c(1-(1/x),(1/x)) # Testing the frequencies of each
+stochgr(env, 100, pv_test)
+
+pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
+stochgr(env, 500, pv_gc)
