@@ -8,6 +8,8 @@ library(raster)
 library(ggplot2)
 library(gridExtra)
 library(dplyr)
+set.seed(4100)
+
 
 #----QUESTION 1----
 
@@ -192,7 +194,7 @@ pv_test = c(1-(1/x),(1/x)) # Testing the frequencies of each
 stochgr(env, 100, pv_test)
 
 pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
-stochgr(env, 500, pv_gc)
+stochgr(env, 100, pv_gc)
 
 pv_comp = data.frame(pv_test, pv_gc)
 rownames(pv_comp) = c("good", "poor")
@@ -205,3 +207,48 @@ stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test)
 # This suggests that the friend's equation works a little better
 # for scalar populations, but not perfect.
 # structured: 1.058 vs scalar: 0.9935
+
+
+
+
+#----Question 2----
+
+# Matrix 1
+s0_1=0.4; sa_1=0.8; m2_1=1.35/0.8; m3_1=1.5/0.8
+
+a1 = matrix(c(0    , sa_1*m2_1  ,sa_1*m3_1 ,
+              s0_1 , 0          , 0        ,
+              0    , sa_1       , 0        ),
+            3,3,byrow=T)
+
+
+# Matrix 2
+s0_2=0.33; sa_2=0.65; m2_2=1.12/0.65; m3_2=1.25/0.65
+
+a2 = matrix(c(0    , sa_2*m2_2 , sa_2*m3_2, 
+              s0_2 , 0         , 0        , 
+              0    , sa_2      , 0        )
+            ,3,3,byrow=T)
+
+#Matrix 3
+s0_3=0.38 ; sa_3=0.85; m2_3=1.4/0.85; m3_3=1.6/0.85
+
+a3 = matrix(c(0    , sa_3*m2_3, sa_3*m3_3,
+              s0_3 , 0        , 0        ,
+              0    , sa_3       , 0        ),
+            3,3,byrow = T)
+
+# Arithmetic mean
+xa = (a1+a2+a3)/3
+
+# Deterministic values for mean matrix
+calc_lam(xa) # lambda
+calc_w(xa) # stable age
+calc_v(xa) # repro val
+
+# stochastic growth
+env_2 = list(a1,a2,a3)
+stochgr(env_2, 100)
+abline(v = calc_lam(xa))
+
+#2c) Lecture 7 page 22
