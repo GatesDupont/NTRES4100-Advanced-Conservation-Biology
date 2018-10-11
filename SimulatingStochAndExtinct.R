@@ -7,6 +7,7 @@ source('~/4100/leslie.R')
 library(raster)
 library(ggplot2)
 library(gridExtra)
+library(dplyr)
 
 #----QUESTION 1----
 
@@ -192,3 +193,7 @@ stochgr(env, 100, pv_test)
 
 pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
 stochgr(env, 500, pv_gc)
+
+pv_comp = data.frame(pv_test, pv_gc)
+rownames(pv_comp) = c("good", "poor")
+t(pv_comp) # Comparing the friend's vals to correct vals
