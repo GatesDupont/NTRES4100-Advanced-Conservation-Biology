@@ -7,6 +7,7 @@ source('~/4100/leslie.R')
 library(raster)
 library(ggplot2)
 library(gridExtra)
+library(dplyr)
 
 #----QUESTION 1----
 
@@ -170,3 +171,32 @@ dry_redF = matrix(c( df1_red*dg     , df2_red*dg     , df3_red*dg     , 0       
 calc_lam(dry)
 calc_lam(dry_redF) # asymptotic growth rate
 calc_lam(dry) - calc_lam(dry_redF) # -0.0711
+
+
+
+
+
+#----Question 1----
+
+# Generating given matricies
+good = matrix(c(0,2,4,0.25,0,0,0,0.6,0),3,3,byrow=T)
+poor = matrix(c(0,0.5,0.7,0.5,0,0,0,0.9,0),3,3,byrow=T)
+
+# Given equation
+x = -log(calc_lam(poor))/log(calc_lam(good))
+calc_lam(poor)*(calc_lam(good)^x)
+
+env = list(good, poor)
+
+pv_test = c(1-(1/x),(1/x)) # Testing the frequencies of each
+stochgr(env, 100, pv_test)
+
+pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
+stochgr(env, 500, pv_gc)
+
+pv_comp = data.frame(pv_test, pv_gc)
+rownames(pv_comp) = c("good", "poor")
+t(pv_comp) # Comparing the friend's vals to correct vals
+
+# So, our friend's equation doesn't work for a structured population
+# but perhaps it would work for a scalar? Idk how to test this, though.
