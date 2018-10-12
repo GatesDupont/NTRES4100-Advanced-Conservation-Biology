@@ -45,6 +45,27 @@ stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test)
 # structured: 1.058 vs scalar: 0.9935
 
 
+#----Regression of proportion good/bad----
+
+pr_good = seq(0,1,by=(1/5))
+lambdas = c()
+for(i in 1:6){
+  lambdas = c(lambdas, stochgr(env, 100, c(pr_good[i], 1-pr_good[i])))
+}
+
+lambdas = c(0.8017918, 0.915635, 0.9974242, 1.045597, 1.059181, 1.038224)
+
+lm1 = lm(lambdas~poly(pr_good, 2))
+predictions <- predict(lm1,data.frame(pr_good=seq(0,1,0.0002)),interval='prediction')
+pred_df = data.frame(fit = predictions[,1], pr_good = seq(0,1,by=(1/length(predictions[,1])))[1:5001])
+final_prop = subset(pred_df, fit < 1.00005 & fit > 0.9999)
+
+plot(lambdas~pr_good, pch=20, cex=2, main="Regression to find lambda=1",
+     xlab = "Proportion of Good Years", ylab = "Lambda")
+lines(pred_df$fit~pred_df$pr_good,col='blue', lwd=0.5)
+abline(h=1.0, lty=2)
+points(sum(final_prop$pr_good)/2,1, cex=3, pch=7, lwd=3, col="red")
+text(0.51,0.99, label = paste(round((sum(final_prop$pr_good)/2),digits=4)), col="Red", cex=1.75)
 
 
 #----QUESTION 2----
@@ -269,4 +290,3 @@ calc_lam(dry) - calc_lam(dry_redF) # -0.0711
 
 
 #----Proportion wet:dry----
-
