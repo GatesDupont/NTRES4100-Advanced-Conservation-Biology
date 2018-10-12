@@ -11,7 +11,98 @@ library(dplyr)
 set.seed(4100)
 
 
+
+
+
 #----QUESTION 1----
+
+# Generating given matricies
+good = matrix(c(0,2,4,0.25,0,0,0,0.6,0),3,3,byrow=T)
+poor = matrix(c(0,0.5,0.7,0.5,0,0,0,0.9,0),3,3,byrow=T)
+
+# Given equation
+x = -log(calc_lam(poor))/log(calc_lam(good))
+calc_lam(poor)*(calc_lam(good)^x)
+
+env = list(good, poor)
+
+pv_test = c(1-(1/x),(1/x)) # Testing the frequencies of each
+stochgr(env, 100, pv_test)
+
+pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
+stochgr(env, 100, pv_gc)
+
+pv_comp = data.frame(pv_test, pv_gc)
+rownames(pv_comp) = c("good", "poor")
+t(pv_comp) # Comparing the friend's vals to correct vals
+
+# So, our friend's equation doesn't work for a structured population
+# but perhaps it would work for a scalar? Idk how to test this, though.
+
+stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test)
+# This suggests that the friend's equation works a little better
+# for scalar populations, but not perfect.
+# structured: 1.058 vs scalar: 0.9935
+
+
+
+
+#----QUESTION 2----
+
+# Matrix 1
+s0_1=0.4; sa_1=0.8; m2_1=1.35/0.8; m3_1=1.5/0.8
+
+a1 = matrix(c(0    , sa_1*m2_1  ,sa_1*m3_1 ,
+              s0_1 , 0          , 0        ,
+              0    , sa_1       , 0        ),
+            3,3,byrow=T)
+
+
+# Matrix 2
+s0_2=0.33; sa_2=0.65; m2_2=1.12/0.65; m3_2=1.25/0.65
+
+a2 = matrix(c(0    , sa_2*m2_2 , sa_2*m3_2, 
+              s0_2 , 0         , 0        , 
+              0    , sa_2      , 0        )
+            ,3,3,byrow=T)
+
+#Matrix 3
+s0_3=0.38 ; sa_3=0.85; m2_3=1.4/0.85; m3_3=1.6/0.85
+
+a3 = matrix(c(0    , sa_3*m2_3, sa_3*m3_3,
+              s0_3 , 0        , 0        ,
+              0    , sa_3     , 0        ),
+            3,3,byrow = T)
+
+# Arithmetic mean
+xa = (a1+a2+a3)/3
+
+
+
+#----Deterministic values for mean matrix----
+calc_lam(xa) # lambda
+calc_w(xa) # stable age
+calc_v(xa) # repro val
+
+# stochastic growth
+env_2 = list(a1,a2,a3)
+stochgr(env_2, 100)
+abline(v = calc_lam(xa))
+
+
+#----Generating extinction probabilities----
+n0i = matrix(c(350,0,0))
+n0ii = matrix(c(0,350,0))
+n0iii = matrix(c(0,0,350))
+
+stoch.quasi.ext(mat = env_2, n0 = n0i, Nx = 50, tmax = 40, maxruns = 125)
+stoch.quasi.ext(mat = env_2, n0 = n0ii, Nx = 50, tmax = 40, maxruns = 125)
+stoch.quasi.ext(mat = env_2, n0 = n0iii, Nx = 50, tmax = 40, maxruns = 125)
+
+
+
+
+#----QUESTION 3----
 
 
 
@@ -174,81 +265,3 @@ calc_lam(dry)
 calc_lam(dry_redF) # asymptotic growth rate
 calc_lam(dry) - calc_lam(dry_redF) # -0.0711
 
-
-
-
-
-#----Question 1----
-
-# Generating given matricies
-good = matrix(c(0,2,4,0.25,0,0,0,0.6,0),3,3,byrow=T)
-poor = matrix(c(0,0.5,0.7,0.5,0,0,0,0.9,0),3,3,byrow=T)
-
-# Given equation
-x = -log(calc_lam(poor))/log(calc_lam(good))
-calc_lam(poor)*(calc_lam(good)^x)
-
-env = list(good, poor)
-
-pv_test = c(1-(1/x),(1/x)) # Testing the frequencies of each
-stochgr(env, 100, pv_test)
-
-pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
-stochgr(env, 100, pv_gc)
-
-pv_comp = data.frame(pv_test, pv_gc)
-rownames(pv_comp) = c("good", "poor")
-t(pv_comp) # Comparing the friend's vals to correct vals
-
-# So, our friend's equation doesn't work for a structured population
-# but perhaps it would work for a scalar? Idk how to test this, though.
-
-stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test)
-# This suggests that the friend's equation works a little better
-# for scalar populations, but not perfect.
-# structured: 1.058 vs scalar: 0.9935
-
-
-
-
-#----Question 2----
-
-# Matrix 1
-s0_1=0.4; sa_1=0.8; m2_1=1.35/0.8; m3_1=1.5/0.8
-
-a1 = matrix(c(0    , sa_1*m2_1  ,sa_1*m3_1 ,
-              s0_1 , 0          , 0        ,
-              0    , sa_1       , 0        ),
-            3,3,byrow=T)
-
-
-# Matrix 2
-s0_2=0.33; sa_2=0.65; m2_2=1.12/0.65; m3_2=1.25/0.65
-
-a2 = matrix(c(0    , sa_2*m2_2 , sa_2*m3_2, 
-              s0_2 , 0         , 0        , 
-              0    , sa_2      , 0        )
-            ,3,3,byrow=T)
-
-#Matrix 3
-s0_3=0.38 ; sa_3=0.85; m2_3=1.4/0.85; m3_3=1.6/0.85
-
-a3 = matrix(c(0    , sa_3*m2_3, sa_3*m3_3,
-              s0_3 , 0        , 0        ,
-              0    , sa_3       , 0        ),
-            3,3,byrow = T)
-
-# Arithmetic mean
-xa = (a1+a2+a3)/3
-
-# Deterministic values for mean matrix
-calc_lam(xa) # lambda
-calc_w(xa) # stable age
-calc_v(xa) # repro val
-
-# stochastic growth
-env_2 = list(a1,a2,a3)
-stochgr(env_2, 100)
-abline(v = calc_lam(xa))
-
-#2c) Lecture 7 page 22
