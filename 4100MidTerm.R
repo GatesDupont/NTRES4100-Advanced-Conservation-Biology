@@ -265,3 +265,8 @@ calc_lam(dry)
 calc_lam(dry_redF) # asymptotic growth rate
 calc_lam(dry) - calc_lam(dry_redF) # -0.0711
 
+
+
+
+#----Proportion wet:dry----
+
