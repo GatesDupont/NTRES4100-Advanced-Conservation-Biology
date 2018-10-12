@@ -11,10 +11,7 @@ library(dplyr)
 set.seed(4100)
 
 
-
-
-
-#----QUESTION 1----
+#-----------------------------------------------QUESTION 1-----------------------------------------------
 
 # Generating given matricies
 good = matrix(c(0,2,4,0.25,0,0,0,0.6,0),3,3,byrow=T)
@@ -30,7 +27,7 @@ pv_test = c(1-(1/x),(1/x)) # Testing the frequencies of each
 pv_test = c(x/(x+1),(1-(x/(x+1))))
 stochgr(env, 100, pv_test)
 
-pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
+pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies for lambda = 1
 stochgr(env, 100, pv_gc)
 
 pv_comp = data.frame(pv_test, pv_gc)
@@ -38,12 +35,11 @@ rownames(pv_comp) = c("good", "poor")
 t(pv_comp) # Comparing the friend's vals to correct vals
 
 # So, our friend's equation doesn't work for a structured population
-# but perhaps it would work for a scalar? Idk how to test this, though.
+# but perhaps it would work for a scalar?
 
-stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test)
-# This suggests that the friend's equation works a little better
-# for scalar populations, but not perfect.
-# structured: 1.058 vs scalar: 0.9935
+stochgr(env, 100, pv_test) # structured
+stochgr(list(calc_lam(good), calc_lam(poor)), 100, pv_test) # scalar
+# Yes, works better for scalar
 
 
 #----Regression of proportion good/bad----
@@ -69,7 +65,7 @@ points(sum(final_prop$pr_good)/2,1, cex=3, pch=7, lwd=3, col="red")
 text(0.51,0.99, label = paste(round((sum(final_prop$pr_good)/2),digits=4)), col="Red", cex=1.75)
 
 
-#----QUESTION 2----
+#-----------------------------------------------QUESTION 2-----------------------------------------------
 
 # Matrix 1
 s0_1=0.4; sa_1=0.8; m2_1=1.35/0.8; m3_1=1.5/0.8
@@ -97,8 +93,12 @@ a3 = matrix(c(0    , sa_3*m2_3, sa_3*m3_3,
             3,3,byrow = T)
 
 # Mean matrix
-xa = (a1+a2+a3)/3 # arithmetic
+xa = (a1+a2+a3)/3 # arithmetic, but we won't use this
 ga = (a1*a2*a3)^(1/3) # geometric
+
+m2 = ga[1,2]/ga[3,2]
+m3 = ga[1,3]/ga[3,2]
+
 
 #----Deterministic values for mean matrix----
 calc_lam(ga) # lambda
@@ -108,22 +108,19 @@ calc_v(ga) # repro val
 # stochastic growth
 env_2 = list(a1,a2,a3)
 stochgr(env_2, 100)
-abline(v = calc_lam(xa))
+abline(v = calc_lam(ga))
 
 #----Generating extinction probabilities----
 n0i = matrix(c(350,0,0))
 n0ii = matrix(c(0,350,0))
 n0iii = matrix(c(0,0,350))
 
+par(mfrow=c(2,2))
 stoch.quasi.ext(mat = env_2, n0 = n0i, Nx = 50, tmax = 40, maxruns = 125)
 stoch.quasi.ext(mat = env_2, n0 = n0ii, Nx = 50, tmax = 40, maxruns = 125)
 stoch.quasi.ext(mat = env_2, n0 = n0iii, Nx = 50, tmax = 40, maxruns = 125)
 
 #----Find change in lambda----
-m2 = ga[1,2]/ga[3,2]
-m3 = ga[1,3]/ga[3,2]
-
-
 params = c(s0=ga[2,1],sa=ga[3,2],m2=ga[1,2]/ga[3,2],m3=ga[1,3]/ga[3,2])
 sym_mat = expression(0  , sa*m2, sa*m3 ,
                      s0 , 0    , 0     ,
@@ -163,9 +160,9 @@ a3_new = matrix(c(a3[1,1], (a3[1,2]/a3[3,2])*sa3_new, (a3[1,3]/a3[3,2])*sa3_new,
 stochgr(list(a1,a2,a3), 100)
 stochgr(list(a1_new,a2_new,a3_new),100)
 
-#----QUESTION 3----
 
 
+#-----------------------------------------------QUESTION 3-----------------------------------------------
 
 #----wet Years----
 
@@ -187,8 +184,6 @@ wet = matrix(c( wf1*wg     , wf2*wg     , wf3*wg     , 0          , 0          ,
 calc_lam(wet) # asymptotic growth rate
 
 
-
-
 #----Dry Years----
 
 df1=8.2 ; df2=12.5 ; df3=19.0 ; ds=0.425 ; de1=0.058 ; de2=0.0045 ; dg=0.080
@@ -205,8 +200,6 @@ dry = matrix(c( df1*dg     , df2*dg     , df3*dg     , 0          , 0          ,
              5,5, byrow=T)
 
 calc_lam(dry) # asymptotic growth rate
-
-
 
 
 #----ltre_ll----
@@ -253,7 +246,6 @@ plot(r.dry.em, axes=F, main = "Dry Years - Elasticity Matrix",
 dev.off()
 
 
-
 #----ll em----
 
 # WET Running LL
@@ -296,8 +288,6 @@ dry_em_bar = ggplot(dryLL, aes(x = row.names(dryLL))) +
 grid.arrange(wet_em_bar, dry_em_bar, ncol=1)
 
 
-
-
 #----Decrease F----
 
 # WET Decreasing rate of seed production by 10%
@@ -326,8 +316,9 @@ calc_lam(dry)
 calc_lam(dry_redF) # asymptotic growth rate
 calc_lam(dry) - calc_lam(dry_redF) # -0.0711
 
-basic_plot(mat=list(wet_redF, dry_redF), 80, 14)
-
+# Seed predator
+basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(7/11,4/11))
+title(main = "Population projection over 100 years")
 
 #----Proportion wet:dry----
 
@@ -349,15 +340,14 @@ plot(mean_lambdas~pr_good_3, pch=20, cex=2, main="Regression to find lambda=1",
 lines(pred_df_3$fit~pred_df_3$pr_good_3,col='blue', lwd=0.5)
 abline(h=1.0, lty=2)
 points(sum(final_prop_3$pr_good_3)/2,1, cex=3, pch=7, lwd=3, col="red")
-#text(0.51,0.99, label = paste(round((sum(final_prop$pr_good)/2),digits=4)), col="Red", cex=1.75)
+text(0.35,0.995, label = paste(round((sum(final_prop_3$pr_good_3)/2),digits=4)), col="Red", cex=1.75)
 
 stochgr(list(wet, dry), 100, c(0.24985, 1-0.24985))
-stochgr(list(wet, dry), 100, c(0.238, 1-0.238))
+stochgr(list(wet, dry), 100, c(0.2375, 1-0.2375))
 
 # Looking at population projection
-basic_plot(mat=list(wet, dry), 2500, 100, prob_vec = c(0.238, 1-0.238))
-
-
+basic_plot(mat=list(wet, dry), 750, 100, prob_vec = c(0.2375, 1-0.2375))
+title(main = "Population projection over 750 years")
 
 
 #----Comparison of population projections-----
@@ -370,7 +360,8 @@ basic_plot(mat=list(wet, dry), 100, 100, prob_vec = c(7/11,4/11))
 basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(7/11,4/11))
 
 # Manage for water
-basic_plot(mat=list(wet, dry), 2500, 100, prob_vec = c(0.238, 1-0.238))
+basic_plot(mat=list(wet, dry), 2500, 100, prob_vec = c(0.2375, 1-0.2375))
 
 # Manage with seed predator and water control
-basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(0.238, 1-0.238))
+basic_plot(mat=list(wet_redF, dry_redF), 80, 100, prob_vec = c(0.2375, 1-0.2375))
+title(main = "Population projection over 80 years")
