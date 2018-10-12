@@ -290,3 +290,66 @@ basic_plot(mat=list(wet_redF, dry_redF), 80, 14)
 
 
 #----Proportion wet:dry----
+
+pr_good_3 = seq(0,1,by=(1/5))
+lambdas = c()
+for(i in 1:6){
+  lambdas = c(lambdas, stochgr(list(wet,dry), 250, c(pr_good_3[i], 1-pr_good_3[i])))
+}
+
+mean_lambdas = c(0.9725294, 0.9948764, 1.015122, 1.033453, 1.050089, 1.065072)
+
+lm3 = lm(mean_lambdas~poly(pr_good_3, 2))
+predictions3 <- predict(lm3,data.frame(pr_good_3=seq(0,1,0.0002)),interval='prediction')
+pred_df_3 = data.frame(fit = predictions3[,1], pr_good_3 = seq(0,1,by=(1/length(predictions3[,1])))[1:5001])
+final_prop_3 = subset(pred_df_3, fit < 1.00002 & fit > 0.99997)
+
+plot(mean_lambdas~pr_good_3, pch=20, cex=2, main="Regression to find lambda=1",
+     xlab = "Proportion of Good Years", ylab = "Lambda")
+lines(pred_df_3$fit~pred_df_3$pr_good_3,col='blue', lwd=0.5)
+abline(h=1.0, lty=2)
+points(sum(final_prop_3$pr_good_3)/2,1, cex=3, pch=7, lwd=3, col="red")
+#text(0.51,0.99, label = paste(round((sum(final_prop$pr_good)/2),digits=4)), col="Red", cex=1.75)
+
+stochgr(list(wet, dry), 100, c(0.24985, 1-0.24985))
+stochgr(list(wet, dry), 100, c(0.238, 1-0.238))
+
+# Looking at population projection
+basic_plot(mat=list(wet, dry), 2500, 100, prob_vec = c(0.238, 1-0.238))
+
+
+#-----Proportion wet:dry & reduced F----
+pr_good_3 = seq(0,1,by=(1/5))
+lambdas = c()
+for(i in 1:6){
+  lambdas = c(lambdas, stochgr(list(wet_redF,dry_redF), 250, c(pr_good_3[i], 1-pr_good_3[i])))
+}
+
+mean_lambdas = c(0.9725294, 0.9948764, 1.015122, 1.033453, 1.050089, 1.065072)
+
+lm3 = lm(mean_lambdas~poly(pr_good_3, 2))
+predictions3 <- predict(lm3,data.frame(pr_good_3=seq(0,1,0.0002)),interval='prediction')
+pred_df_3 = data.frame(fit = predictions3[,1], pr_good_3 = seq(0,1,by=(1/length(predictions3[,1])))[1:5001])
+final_prop_3 = subset(pred_df_3, fit < 1.00002 & fit > 0.99997)
+
+plot(mean_lambdas~pr_good_3, pch=20, cex=2, main="Regression to find lambda=1",
+     xlab = "Proportion of Good Years", ylab = "Lambda")
+lines(pred_df_3$fit~pred_df_3$pr_good_3,col='blue', lwd=0.5)
+abline(h=1.0, lty=2)
+points(sum(final_prop_3$pr_good_3)/2,1, cex=3, pch=7, lwd=3, col="red")
+#text(0.51,0.99, label = paste(round((sum(final_prop$pr_good)/2),digits=4)), col="Red", cex=1.75)
+
+stochgr(list(wet, dry), 100, c(0.24985, 1-0.24985))
+
+stochgr(list(wet, dry), 100, c(0.238, 1-0.238))
+
+# Looking at population projections
+basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(0.238, 1-0.238))
+
+
+#----Comparison of population projections-----
+
+basic_plot(mat=list(wet, dry), 100, 100)
+basic_plot(mat=list(wet_redF, dry_redF), 80, 14)
+basic_plot(mat=list(wet, dry), 2500, 100, prob_vec = c(0.238, 1-0.238))
+basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(0.238, 1-0.238))
