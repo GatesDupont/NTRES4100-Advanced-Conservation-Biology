@@ -27,6 +27,7 @@ calc_lam(poor)*(calc_lam(good)^x)
 env = list(good, poor)
 
 pv_test = c(1-(1/x),(1/x)) # Testing the frequencies of each
+pv_test = c(x/(x+1),(1-(x/(x+1))))
 stochgr(env, 100, pv_test)
 
 pv_gc = c(0.41, 0.59) # Guess and check to get approximate frequencies forlambda = 1
@@ -95,21 +96,19 @@ a3 = matrix(c(0    , sa_3*m2_3, sa_3*m3_3,
               0    , sa_3     , 0        ),
             3,3,byrow = T)
 
-# Arithmetic mean
-xa = (a1+a2+a3)/3
-
-
+# Mean matrix
+xa = (a1+a2+a3)/3 # arithmetic
+ga = (a1*a2*a3)^(1/3) # geometric
 
 #----Deterministic values for mean matrix----
-calc_lam(xa) # lambda
-calc_w(xa) # stable age
-calc_v(xa) # repro val
+calc_lam(ga) # lambda
+calc_w(ga) # stable age
+calc_v(ga) # repro val
 
 # stochastic growth
 env_2 = list(a1,a2,a3)
 stochgr(env_2, 100)
 abline(v = calc_lam(xa))
-
 
 #----Generating extinction probabilities----
 n0i = matrix(c(350,0,0))
@@ -120,8 +119,49 @@ stoch.quasi.ext(mat = env_2, n0 = n0i, Nx = 50, tmax = 40, maxruns = 125)
 stoch.quasi.ext(mat = env_2, n0 = n0ii, Nx = 50, tmax = 40, maxruns = 125)
 stoch.quasi.ext(mat = env_2, n0 = n0iii, Nx = 50, tmax = 40, maxruns = 125)
 
+#----Find change in lambda----
+m2 = ga[1,2]/ga[3,2]
+m3 = ga[1,3]/ga[3,2]
 
 
+params = c(s0=ga[2,1],sa=ga[3,2],m2=ga[1,2]/ga[3,2],m3=ga[1,3]/ga[3,2])
+sym_mat = expression(0  , sa*m2, sa*m3 ,
+                     s0 , 0    , 0     ,
+                     0  , sa   , 0      )
+lower_level(sym_mat, params) # sa has the highest elasticity
+
+#----checking this value----
+sa_new = 0.8526729763390464
+
+ga_1.015 = matrix(c(ga[1,1], (ga[1,2]/ga[3,2])*sa_new, (ga[1,3]/ga[3,2])*sa_new,
+                    ga[2,1], ga[2,2], ga[2,3],
+                    ga[3,1], sa_new, ga[3,3]),
+                  3,3,byrow=T)
+calc_lam(ga_1.015)
+prop.increase = sa_new/ga[3,2] # increase of just under 12 percent
+
+#----Increasing other matricies----
+sa1_new = a1[3,2]*prop.increase
+a1_new = matrix(c(a1[1,1], (a1[1,2]/a1[3,2])*sa1_new, (a1[1,3]/a1[3,2])*sa1_new,
+                  a1[2,1], a1[2,2], a1[2,3],
+                  a1[3,1], sa1_new, a1[3,3]),
+                3,3,byrow=T)
+
+sa2_new = a2[3,2]*prop.increase
+a2_new = matrix(c(a2[1,1], (a2[1,2]/a2[3,2])*sa2_new, (a2[1,3]/a2[3,2])*sa2_new,
+                  a2[2,1], a2[2,2], a2[2,3],
+                  a2[3,1], sa2_new, a2[3,3]),
+                3,3,byrow=T)
+
+sa3_new = a3[3,2]*prop.increase
+a3_new = matrix(c(a3[1,1], (a3[1,2]/a3[3,2])*sa3_new, (a3[1,3]/a3[3,2])*sa3_new,
+                  a3[2,1], a3[2,2], a3[2,3],
+                  a3[3,1], sa3_new, a3[3,3]),
+                3,3,byrow=T)
+
+#----Calculating new stochgr with comparison to previous----
+stochgr(list(a1,a2,a3), 100)
+stochgr(list(a1_new,a2_new,a3_new),100)
 
 #----QUESTION 3----
 
@@ -318,38 +358,19 @@ stochgr(list(wet, dry), 100, c(0.238, 1-0.238))
 basic_plot(mat=list(wet, dry), 2500, 100, prob_vec = c(0.238, 1-0.238))
 
 
-#-----Proportion wet:dry & reduced F----
-pr_good_3 = seq(0,1,by=(1/5))
-lambdas = c()
-for(i in 1:6){
-  lambdas = c(lambdas, stochgr(list(wet_redF,dry_redF), 250, c(pr_good_3[i], 1-pr_good_3[i])))
-}
-
-mean_lambdas = c(0.9725294, 0.9948764, 1.015122, 1.033453, 1.050089, 1.065072)
-
-lm3 = lm(mean_lambdas~poly(pr_good_3, 2))
-predictions3 <- predict(lm3,data.frame(pr_good_3=seq(0,1,0.0002)),interval='prediction')
-pred_df_3 = data.frame(fit = predictions3[,1], pr_good_3 = seq(0,1,by=(1/length(predictions3[,1])))[1:5001])
-final_prop_3 = subset(pred_df_3, fit < 1.00002 & fit > 0.99997)
-
-plot(mean_lambdas~pr_good_3, pch=20, cex=2, main="Regression to find lambda=1",
-     xlab = "Proportion of Good Years", ylab = "Lambda")
-lines(pred_df_3$fit~pred_df_3$pr_good_3,col='blue', lwd=0.5)
-abline(h=1.0, lty=2)
-points(sum(final_prop_3$pr_good_3)/2,1, cex=3, pch=7, lwd=3, col="red")
-#text(0.51,0.99, label = paste(round((sum(final_prop$pr_good)/2),digits=4)), col="Red", cex=1.75)
-
-stochgr(list(wet, dry), 100, c(0.24985, 1-0.24985))
-
-stochgr(list(wet, dry), 100, c(0.238, 1-0.238))
-
-# Looking at population projections
-basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(0.238, 1-0.238))
 
 
 #----Comparison of population projections-----
 
-basic_plot(mat=list(wet, dry), 100, 100)
-basic_plot(mat=list(wet_redF, dry_redF), 80, 14)
+par(mfrow=c(2,2))
+# No management
+basic_plot(mat=list(wet, dry), 100, 100, prob_vec = c(7/11,4/11))
+
+# Seed predator
+basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(7/11,4/11))
+
+# Manage for water
 basic_plot(mat=list(wet, dry), 2500, 100, prob_vec = c(0.238, 1-0.238))
+
+# Manage with seed predator and water control
 basic_plot(mat=list(wet_redF, dry_redF), 100, 100, prob_vec = c(0.238, 1-0.238))
