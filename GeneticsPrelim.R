@@ -18,8 +18,8 @@ drummondii = data.frame(
 )
 
 #----Calculating expected H----
-cuspidate$He = 2 * cuspidate$p * 1-cuspidate$p
-drummondii$He = 2 * drummondii$p * 1-drummondii$p
+cuspidate$He = 2 * cuspidate$p * (1-cuspidate$p)
+drummondii$He = 2 * drummondii$p * (1-drummondii$p)
 # Could also do equation 6 on review guide?
 
 #----cuspidate F stats----
@@ -39,6 +39,4 @@ Fit = Fis + Fst - Fis * Fst # Total / at both levels
 
 H0 # Observed H
 Ht # Metapopulation (total) expected H
-      # Average the He column?
 Hs # Subpopulation expected H
-      # Individual cells in the He column?
