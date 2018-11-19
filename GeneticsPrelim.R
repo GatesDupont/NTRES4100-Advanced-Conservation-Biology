@@ -22,9 +22,19 @@ cuspidate$He = 2 * cuspidate$p * 1-cuspidate$p
 drummondii$He = 2 * drummondii$p * 1-drummondii$p
 # Could also do equation 6 on review guide?
 
-#----Calculating F statistics----
-Fis = H0/Hs # Within-subpop H
-Fst = Hs/Ht # Metapop H
+#----cuspidate F stats----
+Fis.c = 1 -  (mean(cuspidate$H0) / mean(cuspidate$He))
+Fst.c = 1 - (mean(cuspidate$He) / (2*(mean(cuspidate$p)^2)))
+Fit.c = Fis.c + Fst.c - Fis.c * Fst.c 
+
+#----drummondii F stats----
+Fis.d = 1 - (mean(drummondii$H0) / mean(drummondii$He))
+Fst.d = 1 - (mean(drummondii$He) / (2*(mean(drummondii$p)^2)))
+Fit.d = Fis.d + Fst.d - Fis.d * Fst.d 
+
+#----Dummy equations----
+Fis = 1 - H0/Hs # Within-subpop H
+Fst = 1 - Hs/Ht # Metapop H
 Fit = Fis + Fst - Fis * Fst # Total / at both levels
 
 H0 # Observed H
