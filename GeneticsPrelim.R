@@ -33,22 +33,19 @@ Hs.d = mean(drummondii$He)
 Ht.d = mean(2*(drummondii$p^2))
 
 #----cuspidate F stats----
-Fis.c = 1 - (H0.c / Hs.c)
-Fst.c = 1 - (Hs.c / Ht.c)
-Fit.c = Fis.c + Fst.c - Fis.c * Fst.c 
+Fis.c = 1 - (H0.c / Hs.c) # Within-subpop H
+Fst.c = 1 - (Hs.c / Ht.c) # Metapop H
+Fit.c = Fis.c + Fst.c - Fis.c * Fst.c # Total / at both levels
 
 #----drummondii F stats----
 Fis.d = 1 - (H0.d / Hs.d)
 Fst.d = 1 - (Hs.d / Ht.d)
 Fit.d = Fis.d + Fst.d - Fis.d * Fst.d 
 
-#----Dummy equations----
-Fis = 1 - H0/Hs # Within-subpop H
-Fst = 1 - Hs/Ht # Metapop H
-Fit = Fis + Fst - Fis * Fst # Total / at both levels
-
 #------------------------------------QUESTION 2b------------------------------------
 
-#----Calculating Ne----
-Ne.c = (1-Fst.c)/(4*Fst.c)
-Ne.d = (1-Fst.d)/(4*Fst.d)
+#----Calculating Nem----
+Ne_m.d = 0.25*((1/Fst.d)-1)
+
+#------------------------------------QUESTION 2c------------------------------------
+Ne.d = Ne_m.d/0.1
