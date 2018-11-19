@@ -3,6 +3,7 @@
 # F18           #
 # # # # # # # # #
 
+#------------------------------------QUESTION 2a------------------------------------
 
 #----Setting up populations----
 cuspidate = data.frame(
@@ -22,14 +23,23 @@ cuspidate$He = 2 * cuspidate$p * (1-cuspidate$p)
 drummondii$He = 2 * drummondii$p * (1-drummondii$p)
 # Could also do equation 6 on review guide?
 
+#----H stats for each pop----
+H0.c = mean(cuspidate$H0) # Observed H
+Hs.c = mean(cuspidate$He) # Metapopulation (total) expected H
+Ht.c = mean(2*(cuspidate$p^2)) # Subpopulation expected H
+
+H0.d = mean(drummondii$H0) 
+Hs.d = mean(drummondii$He)
+Ht.d = mean(2*(drummondii$p^2))
+
 #----cuspidate F stats----
-Fis.c = 1 -  (mean(cuspidate$H0) / mean(cuspidate$He))
-Fst.c = 1 - (mean(cuspidate$He) / mean(2*(cuspidate$p^2)))
+Fis.c = 1 - (H0.c / Hs.c)
+Fst.c = 1 - (Hs.c / Ht.c)
 Fit.c = Fis.c + Fst.c - Fis.c * Fst.c 
 
 #----drummondii F stats----
-Fis.d = 1 - (mean(drummondii$H0) / mean(drummondii$He))
-Fst.d = 1 - (mean(drummondii$He) / mean(2*(drummondii$p^2)))
+Fis.d = 1 - (H0.d / Hs.d)
+Fst.d = 1 - (Hs.d / Ht.d)
 Fit.d = Fis.d + Fst.d - Fis.d * Fst.d 
 
 #----Dummy equations----
@@ -37,6 +47,8 @@ Fis = 1 - H0/Hs # Within-subpop H
 Fst = 1 - Hs/Ht # Metapop H
 Fit = Fis + Fst - Fis * Fst # Total / at both levels
 
-H0 # Observed H
-Ht # Metapopulation (total) expected H
-Hs # Subpopulation expected H
+#------------------------------------QUESTION 2b------------------------------------
+
+#----Calculating Ne----
+Ne.c = (1-Fst.c)/(4*Fst.c)
+Ne.d = (1-Fst.d)/(4*Fst.d)
