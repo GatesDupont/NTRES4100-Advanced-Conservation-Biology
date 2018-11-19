@@ -24,12 +24,12 @@ drummondii$He = 2 * drummondii$p * (1-drummondii$p)
 
 #----cuspidate F stats----
 Fis.c = 1 -  (mean(cuspidate$H0) / mean(cuspidate$He))
-Fst.c = 1 - (mean(cuspidate$He) / (2*(mean(cuspidate$p)^2)))
+Fst.c = 1 - (mean(cuspidate$He) / mean(2*(cuspidate$p^2)))
 Fit.c = Fis.c + Fst.c - Fis.c * Fst.c 
 
 #----drummondii F stats----
 Fis.d = 1 - (mean(drummondii$H0) / mean(drummondii$He))
-Fst.d = 1 - (mean(drummondii$He) / (2*(mean(drummondii$p)^2)))
+Fst.d = 1 - (mean(drummondii$He) / mean(2*(drummondii$p^2)))
 Fit.d = Fis.d + Fst.d - Fis.d * Fst.d 
 
 #----Dummy equations----
