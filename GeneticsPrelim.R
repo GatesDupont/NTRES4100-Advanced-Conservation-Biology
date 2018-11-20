@@ -5,7 +5,6 @@
 
 library(RColorBrewer)
 
-#------------------------------------QUESTION 2a------------------------------------
 
 #----Setting up populations----
 cuspidate = data.frame(
@@ -19,6 +18,8 @@ drummondii = data.frame(
   p = c(rep(1, 66), 0.86, 0.8, 0.7, 0.96, 0.96, 0.73, 0.91),
   H0 = c(rep(0, 66), 0.06, 0.12, 0.2, 0.03, 0.09, 0.15, 0.06)
 )
+
+#------------------------------------QUESTION 2a------------------------------------
 
 #----Calculating expected H----
 cuspidate$He = 2 * cuspidate$p * (1-cuspidate$p)
@@ -50,6 +51,7 @@ Fst.d = 1 - (Hs.d / Ht.d)
 Fit.d = 1 - (H0.d / Ht.d)
 Fit.d.check = Fis.d + Fst.d - Fis.d * Fst.d 
 
+#----plotting----
 par(mfrow=c(1,3))
 barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), main="Fis", ylim=c(-1,1), col = brewer.pal(n = 10, name = 'Spectral'))
 barplot(c(Fst.c, Fst.d), names.arg = c("cuspidate", "drummondii"), main="Fst", ylim=c(0,1), col =  brewer.pal(n = 10, name = 'Spectral'))
