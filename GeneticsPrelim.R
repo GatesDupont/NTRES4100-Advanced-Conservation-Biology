@@ -43,7 +43,7 @@ Fst.d = 1 - (Hs.d / Ht.d)
 Fit.d = Fis.d + Fst.d - Fis.d * Fst.d 
 
 par(mfrow=c(1,3))
-barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), main="Fis", ylim=c(0,1))
+barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), main="Fis", ylim=c(-1,1))
 barplot(c(Fst.c, Fst.d), names.arg = c("cuspidate", "drummondii"), main="Fst", ylim=c(0,1))
 barplot(c(Fit.c, Fit.d), names.arg = c("cuspidate", "drummondii"), main="Fit", ylim=c(0,1))
 
