@@ -53,9 +53,9 @@ Fit.d.check = Fis.d + Fst.d - Fis.d * Fst.d
 
 #----plotting----
 par(mfrow=c(1,3))
-barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), main="Fis", ylim=c(-1,1), col = brewer.pal(n = 10, name = 'Spectral'))
-barplot(c(Fst.c, Fst.d), names.arg = c("cuspidate", "drummondii"), main="Fst", ylim=c(0,1), col =  brewer.pal(n = 10, name = 'Spectral'))
-barplot(c(Fit.c, Fit.d), names.arg = c("cuspidate", "drummondii"), main="Fit", ylim=c(-1,1), col =  brewer.pal(n = 10, name = 'Spectral'))
+barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), font=3, main="Fis", ylim=c(-1,1), col = brewer.pal(n = 10, name = 'Spectral'))
+barplot(c(Fst.c, Fst.d), names.arg = c("cuspidate", "drummondii"), font=3, main="Fst", ylim=c(0,1), col =  brewer.pal(n = 10, name = 'Spectral'))
+barplot(c(Fit.c, Fit.d), names.arg = c("cuspidate", "drummondii"), font=3, main="Fit", ylim=c(-1,1), col =  brewer.pal(n = 10, name = 'Spectral'))
 legend("topright",  fill = brewer.pal(n = 10, name = 'Spectral')[1:2], legend = c("Selfing", "Non-selfing"), cex=1.25)
 mtext(expression(paste(bold("Population Structure in Selfing and Non-selfing Species of"), bolditalic(" Phlox"))), 
       side = 3, line = -42, outer = TRUE, cex=1.2)
