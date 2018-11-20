@@ -3,6 +3,8 @@
 # F18           #
 # # # # # # # # #
 
+library(RColorBrewer)
+
 #------------------------------------QUESTION 2a------------------------------------
 
 #----Setting up populations----
@@ -26,33 +28,46 @@ drummondii$He = 2 * drummondii$p * (1-drummondii$p)
 #----H stats for each pop----
 H0.c = mean(cuspidate$H0) # Observed H
 Hs.c = mean(cuspidate$He) # Metapopulation (total) expected H
-Ht.c = mean(2*(cuspidate$p^2)) # Subpopulation expected H
+p.bar.c = mean(cuspidate$p)
+Ht.c = 2 * p.bar.c * (1-p.bar.c)
+#Ht.c.old = mean(2*(cuspidate$p^2)) # Subpopulation expected H ------------Not sure this is right
 
 H0.d = mean(drummondii$H0) 
 Hs.d = mean(drummondii$He)
-Ht.d = mean(2*(drummondii$p^2))
+p.bar.d = mean(drummondii$p)
+Ht.d = 2 * p.bar.d * (1-p.bar.d)
+#Ht.d.old = mean(2*(drummondii$p^2))
 
 #----cuspidate F stats----
 Fis.c = 1 - (H0.c / Hs.c) # Within-subpop H
 Fst.c = 1 - (Hs.c / Ht.c) # Metapop H
-Fit.c = Fis.c + Fst.c - Fis.c * Fst.c # Total / at both levels
+Fit.c = 1 - (H0.c / Ht.c) # Total / at both levels
+Fit.c.check = Fis.c + Fst.c - Fis.c * Fst.c # Math check
 
 #----drummondii F stats----
 Fis.d = 1 - (H0.d / Hs.d)
 Fst.d = 1 - (Hs.d / Ht.d)
-Fit.d = Fis.d + Fst.d - Fis.d * Fst.d 
+Fit.d = 1 - (H0.d / Ht.d)
+Fit.d.check = Fis.d + Fst.d - Fis.d * Fst.d 
 
 par(mfrow=c(1,3))
-barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), main="Fis", ylim=c(-1,1))
-barplot(c(Fst.c, Fst.d), names.arg = c("cuspidate", "drummondii"), main="Fst", ylim=c(0,1))
-barplot(c(Fit.c, Fit.d), names.arg = c("cuspidate", "drummondii"), main="Fit", ylim=c(0,1))
+barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), main="Fis", ylim=c(-1,1), col = brewer.pal(n = 10, name = 'Spectral'))
+barplot(c(Fst.c, Fst.d), names.arg = c("cuspidate", "drummondii"), main="Fst", ylim=c(0,1), col =  brewer.pal(n = 10, name = 'Spectral'))
+barplot(c(Fit.c, Fit.d), names.arg = c("cuspidate", "drummondii"), main="Fit", ylim=c(-1,1), col =  brewer.pal(n = 10, name = 'Spectral'))
+dev.off()
 
 #------------------------------------QUESTION 2b------------------------------------
 
 #----Calculating Nem----
 Ne_m.d = 0.25*((1/Fst.d)-1)
+Ne_m.d2 = (1-Fst.d)/(4*Fst.d)
 
 #------------------------------------QUESTION 2c------------------------------------
 
 #----Calculating Ne----
 Ne.d = Ne_m.d/0.1
+
+#------------------------------------QUESTION 2d------------------------------------
+
+#----Calculating Ne----
+Ne.d.2 = Ne_m.d/(0.1*10)
