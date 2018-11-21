@@ -24,20 +24,17 @@ drummondii = data.frame(
 #----Calculating expected H----
 cuspidate$He = 2 * cuspidate$p * (1-cuspidate$p)
 drummondii$He = 2 * drummondii$p * (1-drummondii$p)
-# Could also do equation 6 on review guide?
 
 #----H stats for each pop----
 H0.c = mean(cuspidate$H0) # Observed H
 Hs.c = mean(cuspidate$He) # Metapopulation (total) expected H
 p.bar.c = mean(cuspidate$p)
 Ht.c = 2 * p.bar.c * (1-p.bar.c)
-#Ht.c.old = mean(2*(cuspidate$p^2)) # Subpopulation expected H ------------Not sure this is right
 
 H0.d = mean(drummondii$H0) 
 Hs.d = mean(drummondii$He)
 p.bar.d = mean(drummondii$p)
 Ht.d = 2 * p.bar.d * (1-p.bar.d)
-#Ht.d.old = mean(2*(drummondii$p^2))
 
 #----cuspidate F stats----
 Fis.c = 1 - (H0.c / Hs.c) # Within-subpop H
