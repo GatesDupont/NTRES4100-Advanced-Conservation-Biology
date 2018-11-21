@@ -44,19 +44,23 @@ Fis.c = 1 - (H0.c / Hs.c) # Within-subpop H
 Fst.c = 1 - (Hs.c / Ht.c) # Metapop H
 Fit.c = 1 - (H0.c / Ht.c) # Total / at both levels
 Fit.c.check = Fis.c + Fst.c - Fis.c * Fst.c # Math check
+round(Fit.c.check, digits=4) == round(Fit.c, digits=4)
+round((1-Fit.c), digits=4) == round(((1-Fis.c)*(1-Fst.c)), digits=4) # Second check
 
 #----drummondii F stats----
 Fis.d = 1 - (H0.d / Hs.d)
 Fst.d = 1 - (Hs.d / Ht.d)
 Fit.d = 1 - (H0.d / Ht.d)
 Fit.d.check = Fis.d + Fst.d - Fis.d * Fst.d 
+round(Fit.d.check, digits=4) == round(Fit.d, digits=4)
+round((1-Fit.d), digits=4) == round(((1-Fis.d)*(1-Fst.d)), digits=4) # Second check
 
 #----plotting----
 par(mfrow=c(1,3), mar=c(4,3,11,3))
 barplot(c(Fis.c, Fis.d), names.arg = c("cuspidate", "drummondii"), font=3, main="Fis", ylim=c(-1,1), col = brewer.pal(n = 10, name = 'Spectral'), border=NA)
 barplot(c(Fst.c, Fst.d), names.arg = c("cuspidate", "drummondii"), font=3, main="Fst", ylim=c(0,1), col =  brewer.pal(n = 10, name = 'Spectral'), border=NA)
 barplot(c(Fit.c, Fit.d), names.arg = c("cuspidate", "drummondii"), font=3, main="Fit", ylim=c(-1,1), col =  brewer.pal(n = 10, name = 'Spectral'), border=NA)
-legend("topright",  fill = brewer.pal(n = 10, name = 'Spectral')[1:2], legend = c("Selfing", "Non-selfing"), cex=1.2)
+legend("topright",  fill = brewer.pal(n = 10, name = 'Spectral')[1:2], legend = c("Selfing", "Outcrossing"), cex=1.2)
 mtext(expression(paste(bold("Mating Systems and Population Structure in"), bolditalic(" Phlox"))), 
       side = 3, line = -4, outer = TRUE, cex=2)
 #dev.off()
